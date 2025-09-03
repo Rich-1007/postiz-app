@@ -7,7 +7,6 @@ services:
     runtime: docker
     name: postiz-app
     plan: free
-    repo: https://github.com/postiz/postiz
     dockerfilePath: Dockerfile
     healthCheckPath: /
     envVars:
