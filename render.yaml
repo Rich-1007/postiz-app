@@ -14,7 +14,7 @@ services:
   # Web service
   - type: web
     name: postiz-app
-    plan: starter
+    plan: free
     runtime: docker
     repo: https://github.com/postiz/postiz
     dockerfilePath: ./Dockerfile
