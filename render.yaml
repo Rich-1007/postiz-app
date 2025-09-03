@@ -1,77 +1,43 @@
 services:
-  # Managed PostgreSQL Database for Postiz
-  - type: pserv
-    name: postiz-db
-    plan: free
-    postgres:
-      version: 15
-
-  # Managed Redis Instance for Caching & Queues
-  - type: pserv
-    name: postiz-redis
-    plan: free
-    redis:
-      version: 7
-
   # The Postiz Web Application
   - type: web
     name: postiz-app
-    plan: starter # 'free' plan may be too slow or time out during the first build. 'starter' is recommended.
+    plan: starter # 'free' plan may time out on the first build. 'starter' is recommended.
     runtime: docker
-    repo: https://github.com/postiz/postiz # This uses the official repo for the build
+    repo: https://github.com/postiz/postiz
     dockerfilePath: ./Dockerfile
     healthCheckPath: /
     envVars:
       # General App Settings
       - key: APP_URL
         value: https://${RENDER_EXTERNAL_HOSTNAME}
-      - key: APP_KEY # Render will generate a secure random value
-        generateValue: true
+      - key: APP_KEY
+        generateValue: true # Render will generate a secure random value
       - key: TRUSTED_PROXIES
         value: "*" # Required for Render's load balancer
 
-      # Database Connection (linked to the database service above)
+      # Database Connection (linked to the database below)
       - key: DB_CONNECTION
         value: pgsql
-      - key: DB_HOST
-        fromService:
-          type: pserv
+      - from:
+          type: postgresql
           name: postiz-db
-          property: host
-      - key: DB_PORT
-        fromService:
-          type: pserv
-          name: postiz-db
-          property: port
-      - key: DB_DATABASE
-        fromService:
-          type: pserv
-          name: postiz-db
-          property: database
-      - key: DB_USERNAME
-        fromService:
-          type: pserv
-          name: postiz-db
-          property: user
-      - key: DB_PASSWORD
-        fromService:
-          type: pserv
-          name: postiz-db
-          property: password
+          property: connectionString
 
-      # Redis Connection (linked to the redis service above)
-      - key: REDIS_HOST
-        fromService:
-          type: pserv
+      # Redis Connection (linked to the redis instance below)
+      - from:
+          type: redis
           name: postiz-redis
-          property: host
-      - key: REDIS_PASSWORD
-        fromService:
-          type: pserv
-          name: postiz-redis
-          property: password
-      - key: REDIS_PORT
-        fromService:
-          type: pserv
-          name: postiz-redis
-          property: port
+          property: connectionString
+
+# Managed PostgreSQL Database for Postiz
+databases:
+  - name: postiz-db
+    plan: free
+    postgres:
+      version: 15
+
+# Managed Redis Instance for Caching & Queues
+redis:
+  - name: postiz-redis
+    plan: free
