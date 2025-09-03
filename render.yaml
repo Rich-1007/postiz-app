@@ -6,7 +6,7 @@ services:
   - type: web
     runtime: docker
     name: postiz-app
-    plan: starter
+    plan: free
     repo: https://github.com/postiz/postiz
     dockerfilePath: Dockerfile
     healthCheckPath: /
