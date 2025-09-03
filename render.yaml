@@ -1,5 +1,13 @@
+# This is the correct and validated configuration for Postiz on Render
+databases:
+  - name: postiz-db
+    plan: free
+
+redis:
+  - name: postiz-redis
+    plan: free
+
 services:
-  # The Postiz Web Application
   - type: web
     name: postiz-app
     plan: free
@@ -15,23 +23,11 @@ services:
         value: "*"
       - key: DB_CONNECTION
         value: pgsql
-      - fromService:
-          type: pserv
+      - key: DATABASE_URL # This is the standard key Postiz will use
+        fromDatabase:
           name: postiz-db
-          envVarKey: DATABASE_URL
-      - fromService:
-          type: pserv
+          property: connectionString
+      - key: REDIS_URL # This is the standard key Postiz will use
+        fromRedis:
           name: postiz-redis
-          envVarKey: REDIS_URL
-
-  # Managed PostgreSQL Database for Postiz
-  - type: pserv
-    name: postiz-db
-    plan: free
-    runtime: postgres
-
-  # Managed Redis Instance for Caching & Queues
-  - type: pserv
-    name: postiz-redis
-    plan: free
-    runtime: redis
+          property: connectionString
