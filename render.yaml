@@ -20,7 +20,7 @@ services:
       - key: DB_CONNECTION
         value: pgsql
       - from:
-          type: postgresql
+          type: postgres
           name: postiz-db
           property: connectionString
 
@@ -30,12 +30,13 @@ services:
           name: postiz-redis
           property: connectionString
 
-# Managed PostgreSQL Database for Postiz
-databases:
-  - name: postiz-db
+previews:
+  # Managed PostgreSQL Database for Postiz
+  - type: postgres
+    name: postiz-db
     plan: free
 
-# Managed Redis Instance for Caching & Queues
-redis:
-  - name: postiz-redis
+  # Managed Redis Instance for Caching & Queues
+  - type: redis
+    name: postiz-redis
     plan: free
