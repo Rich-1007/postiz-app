@@ -1,42 +1,38 @@
+# render.yaml — deploy Postiz with web + managed Postgres + managed Redis (previews)
 services:
-  # The Postiz Web Application
   - type: web
     name: postiz-app
-    plan: starter # 'free' plan may time out on the first build. 'starter' is recommended.
-    runtime: docker
+    env: docker
+    plan: starter
     repo: https://github.com/postiz/postiz
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: Dockerfile
     healthCheckPath: /
     envVars:
-      # General App Settings
       - key: APP_URL
-        value: https://${RENDER_EXTERNAL_HOSTNAME}
+        value: "https://${RENDER_EXTERNAL_HOSTNAME}"
       - key: APP_KEY
-        generateValue: true # Render will generate a secure random value
+        generate: true
       - key: TRUSTED_PROXIES
-        value: "*" # Required for Render's load balancer
-
-      # Database Connection (linked to the database below)
+        value: "*"
       - key: DB_CONNECTION
-        value: pgsql
-      - from:
-          type: postgres
+        value: "pgsql"
+      - key: DATABASE_URL
+        fromService:
           name: postiz-db
           property: connectionString
-
-      # Redis Connection (linked to the redis instance below)
-      - from:
-          type: redis
+      - key: REDIS_URL
+        fromService:
           name: postiz-redis
           property: connectionString
 
 previews:
-  # Managed PostgreSQL Database for Postiz
-  - type: postgres
-    name: postiz-db
-    plan: free
-
-  # Managed Redis Instance for Caching & Queues
-  - type: redis
-    name: postiz-redis
-    plan: free
+  services:
+    - type: postgres
+      name: postiz-db
+      plan: free
+      # optional: engineVersion: 14
+      # optional: initialDatabases: [postiz]
+    - type: redis
+      name: postiz-redis
+      plan: free
+      # optional: redisVersion: "6"
