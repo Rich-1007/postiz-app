@@ -34,8 +34,6 @@ services:
 databases:
   - name: postiz-db
     plan: free
-    postgres:
-      version: 15
 
 # Managed Redis Instance for Caching & Queues
 redis:
